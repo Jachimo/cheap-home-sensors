@@ -1,0 +1,9 @@
+# -*- mode: python -*-
+
+# Config file for TempSensor
+# --------------------------
+# Copy (or "Save As") this file to 'config.py' with real values.
+# Only the '.example' version is saved in VCS.
+
+SSID = "Your Network Name Here"
+KEY = "WiFi Key Here"
