@@ -24,7 +24,10 @@ Bosch BME280 I2C temp/humid sensor.
 * [MicroPython: MQTT – Publish BME280 Sensor Readings][rnt3] - Very close to
   my goal of a very inexpensive temperature sensor with the 8266!
 * [MicroPython Asynchronous MQTT][mqttas] - Modern library for reliable MQTT
-  client operation; avoids some failure modes of the official uP library.
+  client operation; avoids some failure modes of the official uP
+  library.
+* [Bosch BME280 Datasheet][bosch] - Official documentation on the
+  BME280 sensor and its outputs.
 
 [EN]: https://share.evernote.com/note/1eaa817e-7288-409e-be1a-0f192c8e4d94
 [inst]: https://www.kevsrobots.com/blog/how-to-install-micropython.html
@@ -33,7 +36,7 @@ Bosch BME280 I2C temp/humid sensor.
 [rnt2]: https://randomnerdtutorials.com/esp8266-bme280-arduino-ide/
 [rnt3]: https://randomnerdtutorials.com/micropython-mqtt-publish-bme280-esp32-esp8266/
 [mqttas]: https://github.com/peterhinch/micropython-mqtt/tree/master
-
+[bosch]: https://www.bosch-sensortec.com/media/boschsensortec/downloads/datasheets/bst-bme280-ds002.pdf
 
 ### Environment Setup
 

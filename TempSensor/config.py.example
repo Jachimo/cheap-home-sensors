@@ -5,5 +5,19 @@
 # Copy (or "Save As") this file to 'config.py' with real values.
 # Only the '.example' version is saved in VCS.
 
-SSID = "Your Network Name Here"
-KEY = "WiFi Key Here"
+import ubinascii
+import machine
+
+
+# Set manually if desired, otherwise the machine ID will be used
+SENSOR_ID = ubinascii.hexlify(machine.unique_id())
+
+WIFI_NETS = [
+  { "SSID": "NetworkName", "AUTH": "AuthKey123456" },
+  { "SSID": "AltNetworkName", "AUTH": "AltAuthKey123456" }
+]
+
+MQTT_BROKERS = [
+  { "ADDR": "my.mqtt.broker", "PORT": "9090" },
+  { "ADDR": "alt.mqtt.broker", "PORT": "443" }
+]
