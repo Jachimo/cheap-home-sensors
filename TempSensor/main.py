@@ -10,6 +10,8 @@ import ntptime
 
 
 
+# Utility Classes
+
 class WiFiManager:
     def __init__(self, networks):
         """
@@ -82,6 +84,29 @@ class WiFiManager:
             print("WiFi disabled")
 
 
+class SensorManager:
+    def __init__(self, scl_pin=5, sda_pin=4):  # Change if I2C bus is not pins 4/5
+        i2c = machine.I2C(scl=machine.Pin(scl_pin), sda=machine.Pin(sda_pin))
+        try:
+            self.bme = bme280_int.BME280(i2c=i2c, address=0x76)
+            print("BME280 sensor initialized")
+        except Exception as e:
+            print(f"Failed to initialize BME280: {e}")
+            raise
+    
+    def read_temperature(self):
+        try:
+            self.rawbme = self.bme.read_compensated_data()  # returns array for further processing
+            self.tempc = self.rawbme[0] / 100  # temp in deg C
+            self.tempf = (self.tempc * 1.8) + 32 
+            return self.tempc, self.tempf
+        except Exception as e:
+            print(f"Error reading temperature: {e}")
+            return None
+
+
+# Timer-Driven Functions
+
 async def set_rtc_ntp(wifi_manager):
     while True:
         if wifi_manager.is_connected:
@@ -91,26 +116,36 @@ async def set_rtc_ntp(wifi_manager):
             await asyncio.sleep(60)    # if network down, check again in a minute
 
 
-async def read_temp():
-    raw = bme.read_compensated_data()  # returns array for further processing
-    tempc = raw[0] / 100  # temp in deg C
-    tempf = (tempc * 1.8) + 32 
-    return tempc, tempf
+async def check_sensor(sensor_manager):
+    while True:
+        temps = sensor_manager.read_temperature()
+        if temp is not None:
+            print("Temperature is ", temps)
+            await asyncio.sleep(30)
+        else:
+            print("Failed to read temperature")
+            await asyncio.sleep(10)
 
+
+# Main Loop
 
 async def main():
+    # Initialize the "managers"
     wifi_manager = WiFiManager(config.NETWORKS)
-    
+    sensor_manager = SensorManager()
+
+    # Do the real work
     try:
         if not await wifi_manager.scan_and_connect():
             print("No known networks in range, will continue to retry")
 
-        # these will only run once connected to network
-        wifi_monitor = asyncio.create_task(wifi_manager.monitor_connection())
-        ntp_update = asyncio.create_task(set_rtc_ntp(wifi_manager))
-        # TODO: read_temp()
+        # Once connected to network
+        wifi_t = asyncio.create_task(wifi_manager.monitor_connection())
+        ntp_t = asyncio.create_task(set_rtc_ntp(wifi_manager))
+        temp_t = asyncio.create_task(check_sensor(sensor_manager)
         # TODO: send_mqtt_message()
-        await asyncio.gather(wifi_monitor, ntp_update)  # TODO: add other tasks here
+
+        await asyncio.gather(wifi_t, ntp_t, temp_t)  # TODO: add other tasks here
     
     except Exception as e:
         print("Exception - terminating all")
