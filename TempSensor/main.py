@@ -15,8 +15,8 @@ import ntptime
 class WiFiManager:
     def __init__(self, networks):
         """
-        Initialize with list of networks
-        networks should be a list of tuples: [(ssid1, password1), (ssid2, password2), ...]
+        Initialize with list of networks.
+        Networks should be a list of tuples: [(ssid1, password1), (ssid2, password2), ...]
         """
         self.networks = networks
         self.wlan = network.WLAN(network.STA_IF)
@@ -67,7 +67,7 @@ class WiFiManager:
         while True:
             if not self.wlan.isconnected():
                 if self.is_connected:  # Only print if we're losing an existing connection
-                    print("WiFi connection lost! Scanning for known networks...")
+                    print("WiFi connection lost - Rescanning")
                 self.is_connected = False
                 try:
                     await self.scan_and_connect()
