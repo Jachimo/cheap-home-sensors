@@ -13,11 +13,11 @@ import machine
 SENSOR_ID = ubinascii.hexlify(machine.unique_id())
 
 WIFI_NETS = [
-  { "SSID": "NetworkName", "AUTH": "AuthKey123456" },
-  { "SSID": "AltNetworkName", "AUTH": "AltAuthKey123456" }
+  ("NetworkName", "AuthKey123456"),
+  ("AltNetworkName", "AltAuthKey123456")
 ]
 
 MQTT_BROKERS = [
-  { "ADDR": "my.mqtt.broker", "PORT": "9090" },
-  { "ADDR": "alt.mqtt.broker", "PORT": "443" }
+  ("my.mqtt.broker", "9090"),
+  ("alt.mqtt.broker", "443" )
 ]
