@@ -11,27 +11,34 @@ Bosch BME280 I2C temp/humid sensor.
 
 
 ### Background Reading
-
-* [Evernote Notes Page][EN] - Login required, not public
-* [How to Install MicroPython][inst] - Good "getting started" tutorial
-* [Thonny IDE][thonny] - Python/MicroPython IDE; easier than setting up VSCode
-  with MicroPython support
-* [Getting Started with MQTT on ESP32/ESP8266][rnt] - Uses the uPyCraft IDE and
-  the `umqttsimple` library.  I can verify that this code does work, but it has
-  inlined WiFi credentials and is probably best used as a starting point.
-* [ESP8266 with BME280 using Arduino IDE][rnt2] - Uses Arduino instead of
-  MicroPython but uses the modern BME280 sensor.
-* [MicroPython: MQTT – Publish BME280 Sensor Readings][rnt3] - Very close to
-  my goal of a very inexpensive temperature sensor with the 8266!
-* [MicroPython Asynchronous MQTT][mqttas] - Modern library for reliable MQTT
-  client operation; avoids some failure modes of the official uP
-  library.
-* [Bosch BME280 Datasheet][bosch] - Official documentation on the
-  BME280 sensor and its outputs.
+* **Project-Specific** 
+  * [Evernote Notes Page][EN] - Login required, not public
+* **MicroPython**
+  * [How to Install MicroPython][inst] - Good "getting started" tutorial
+  * [Thonny IDE][thonny] - Python/MicroPython IDE; easier than setting up VSCode
+    with MicroPython support
+  * [MicroPython: MQTT – Publish BME280 Sensor Readings][rnt3] - Very close to
+    my goal of a very inexpensive temperature sensor with the 8266!
+  * [MicroPython Asynchronous MQTT][mqttas] - Modern library for reliable MQTT
+    client operation; avoids some failure modes of the official uP
+    library.
+* **Python** (Generally)
+  * [An In-Depth Guide to `asyncio` and `await` in Python][await] - Good general
+    reference on the Python/uP asyncio library.
+* **ESP8266 Embedded System**
+  * [Getting Started with MQTT on ESP32/ESP8266][rnt] - Uses the uPyCraft IDE and
+    the `umqttsimple` library.  I can verify that this code does work, but it has
+    inlined WiFi credentials and is probably best used as a starting point.
+  * [ESP8266 with BME280 using Arduino IDE][rnt2] - Uses Arduino instead of
+    MicroPython but uses the modern BME280 sensor.
+* **Other Hardware**
+  * [Bosch BME280 Datasheet][bosch] - Official documentation on the
+    BME280 sensor and its outputs.
 
 [EN]: https://share.evernote.com/note/1eaa817e-7288-409e-be1a-0f192c8e4d94
 [inst]: https://www.kevsrobots.com/blog/how-to-install-micropython.html
 [thonny]: https://thonny.org/
+[await]: https://medium.com/@danielwume/an-in-depth-guide-to-asyncio-and-await-in-python-059c3ecc9d96
 [rnt]: https://randomnerdtutorials.com/micropython-mqtt-esp32-esp8266/
 [rnt2]: https://randomnerdtutorials.com/esp8266-bme280-arduino-ide/
 [rnt3]: https://randomnerdtutorials.com/micropython-mqtt-publish-bme280-esp32-esp8266/

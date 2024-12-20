@@ -38,9 +38,17 @@ async def connect():
         print("Connect: ", wlan.ifconfig())
 
 
+async def wifi_check_reconnect():
+    while True:
+        if not wlan.isconnected():
+            await connect()
+        await asyncio.sleep(30)
+
+
 async def set_rtc_ntp():
-    # default NTP server is pool.ntp.org, set ntptime.host to change
-    ntptime.settime()
+    while True:
+        ntptime.settime()  # default server is pool.ntp.org, set ntptime.host to change
+        await asyncio.sleep(3600)  # update RTC hourly
 
 
 async def read_temp():
@@ -51,18 +59,15 @@ async def read_temp():
 
 
 async def main():
-    while True:  # "main loop" for the microcontroller
-        if not wlan.isconnected():
-            connect_task = asyncio.create_task(connect())
-        else:
-            print("Reusing connection: ", wlan.ifconfig())
-        
-        await set_rtc_ntp()  # TODO: Move this to boot.py?
+    wifi_t = asyncio.create_task(wifi_check_reconnect())
+    ntp_t = asyncio.create_task(set_rtc_ntp())
+    
+    while True:
+        # finally read the damn temperature...
         temps = await read_temp()
-        print(temps)
-        
-        await asyncio.sleep(30)  # loop every 30s
-
+        print(temps)  # DEBUG: Remove me later
+        # TODO: Post to MQTT broker
+        await asyncio.sleep(10)
 
 # Run with asyncio scheduling
 asyncio.run(main())
