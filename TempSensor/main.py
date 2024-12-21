@@ -87,10 +87,10 @@ class WiFiManager:
 
 
 class SensorManager:
-    def __init__(self, scl_pin, sda_pin):
+    def __init__(self, scl_pin, sda_pin, i2c_address):
         i2c = machine.I2C(scl=machine.Pin(scl_pin), sda=machine.Pin(sda_pin))
         try:
-            self.bme = bme280_int.BME280(i2c=i2c, address=0x76)
+            self.bme = bme280_int.BME280(i2c=i2c, address=i2c_address)
             print("BME280 sensor initialized")
         except Exception as e:
             print(f"Failed to initialize BME280: {e}")
@@ -110,9 +110,10 @@ class SensorManager:
 # Timer-Driven Functions
 
 async def set_rtc_ntp(wifi_manager):
+    ntptime.host = "pool.ntp.org"
     while True:
         if wifi_manager.is_connected:
-            ntptime.settime()  # default server is pool.ntp.org, set ntptime.host to change
+            ntptime.settime()
             await asyncio.sleep(3600)  # update RTC hourly
         else:
             await asyncio.sleep(60)    # if network down, check again in a minute
@@ -134,7 +135,7 @@ async def check_sensor(sensor_manager):
 async def main():
     # Initialize the "managers"
     wifi_manager = WiFiManager(config.WIFI_NETS)
-    sensor_manager = SensorManager(scl_pin=5, sda_pin=4)  # Change as needed based on hardware
+    sensor_manager = SensorManager(scl_pin=5, sda_pin=4, i2c_address=0x76)  # Change as needed based on hardware
 
     try:
         if not await wifi_manager.scan_and_connect():
