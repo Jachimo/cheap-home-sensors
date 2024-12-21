@@ -17,7 +17,5 @@ WIFI_NETS = [
   ("AltNetworkName", "AltAuthKey123456")
 ]
 
-MQTT_BROKERS = [
-  ("my.mqtt.broker", "9090"),
-  ("alt.mqtt.broker", "443" )
-]
+MQTT_ADDR = "my.mqtt.broker.example"
+MQTT_PORT = 1883

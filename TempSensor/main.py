@@ -8,7 +8,7 @@ import bme280_int
 import collections
 import ntptime
 import time
-
+from umqtt.simple import MQTTClient
 
 
 # Utility Classes
@@ -107,7 +107,55 @@ class SensorManager:
             return None
 
 
-# Timer-Driven Functions
+class MQTTManager:
+    def __init__(self, mqtt_server, mqtt_port=1883, mqtt_user=None, mqtt_password=None):
+        self.mqtt_server = mqtt_server
+        self.mqtt_port = mqtt_port
+        self.mqtt_user = mqtt_user
+        self.mqtt_password = mqtt_password
+        self.client = None
+        self.is_connected = False
+
+    async def connect(self):
+        try:
+            self.client = MQTTClient(
+                config.SENSOR_ID,  # set in config.py to override default
+                self.mqtt_server,
+                port=self.mqtt_port,
+                user=self.mqtt_user,
+                password=self.mqtt_password
+            )
+            self.client.connect()
+            self.is_connected = True
+            print(f"Connected to MQTT broker at {self.mqtt_server}")
+            return True
+        except Exception as e:
+            print(f"Failed to connect to MQTT broker: {e}")
+            self.is_connected = False
+            return False
+
+    def disconnect(self):
+        if self.client:
+            try:
+                self.client.disconnect()
+            except:
+                pass
+        self.is_connected = False
+
+    def publish(self, topic, message):
+        if self.is_connected:
+            try:
+                self.client.publish(topic, message)
+                return True
+            except Exception as e:
+                print(f"Failed to publish MQTT message: {e}")
+                self.is_connected = False
+                return False
+        return False
+
+
+
+# Timer-Driven Coroutines
 
 async def set_rtc_ntp(wifi_manager):
     ntptime.host = "pool.ntp.org"
@@ -119,16 +167,22 @@ async def set_rtc_ntp(wifi_manager):
             await asyncio.sleep(60)    # if network down, check again in a minute
 
 
-async def check_sensor(sensor_manager):
+async def mqtt_acquire_transmit(wifi_manager, sensor_manager, mqtt_manager, topic_base="sensor"):
     while True:
-        temps = sensor_manager.read_temperature()
-        if temps is not None:
-            print("Temperature is ", temps)
-            await asyncio.sleep(30)
+        if wifi_manager.is_connected:
+            if not mqtt_manager.is_connected:
+                await mqtt_manager.connect()
+            
+            if mqtt_manager.is_connected:
+                temps = sensor_manager.read_temperature()
+                if temps is not None:
+                    temp_c, temp_f = temps
+                    mqtt_manager.publish(f"{topic_base}/{config.SENSOR_ID}/temperature/", temp_f)
+                await asyncio.sleep(30)  # Sensor reading interval
+            else:
+                await asyncio.sleep(5)  # Wait before retry
         else:
-            print("Failed to read temperature")
-            await asyncio.sleep(10)
-
+            await asyncio.sleep(5)  # Wait for WiFi
 
 # Main Loop
 
@@ -136,26 +190,23 @@ async def main():
     # Initialize the "managers"
     wifi_manager = WiFiManager(config.WIFI_NETS)
     sensor_manager = SensorManager(scl_pin=5, sda_pin=4, i2c_address=0x76)  # Change as needed based on hardware
+    mqtt_manager = MQTTManager(config.MQTT_ADDR)
 
     try:
         if not await wifi_manager.scan_and_connect():
             print("No known networks in range, will continue to retry")
-
         wifi_t = asyncio.create_task(wifi_manager.monitor_connection())
         ntp_t = asyncio.create_task(set_rtc_ntp(wifi_manager))
-        temp_t = asyncio.create_task(check_sensor(sensor_manager))
-        # mqtt_t = asyncio.create_task(mqtt_transmit(???))
+        mqtt_t = asyncio.create_task(mqtt_acquire_transmit(wifi_manager, sensor_manager, mqtt_manager))
+        await asyncio.gather(wifi_t, ntp_t, mqtt_t)
 
-        await asyncio.gather(wifi_t, ntp_t, temp_t)  # ,mqtt_t)
-    
     except Exception as e:
         print("Exception - terminating")
         print(e)
         try:
             wifi_t.cancel()
             ntp_t.cancel()
-            temp_t.cancel()
-            # mqtt_t.cancel()
+            mqtt_t.cancel()
         except (asyncio.CancelledError, NameError):
             print("Tasks cancelled")
     
