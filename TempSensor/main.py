@@ -7,6 +7,7 @@ import asyncio
 import bme280_int
 import collections
 import ntptime
+import time
 
 
 
@@ -44,6 +45,7 @@ class WiFiManager:
         # Scan for available networks
         print("Scanning for networks...")
         available_networks = set(ssid.decode() for ssid, *_ in self.wlan.scan())
+        # Note: We could retain RSSI info and choose strongest known network, if needed
         
         # Try each known network that is in range
         for ssid, password in self.networks:
@@ -85,7 +87,7 @@ class WiFiManager:
 
 
 class SensorManager:
-    def __init__(self, scl_pin=5, sda_pin=4):  # Change if I2C bus is not pins 4/5
+    def __init__(self, scl_pin, sda_pin):
         i2c = machine.I2C(scl=machine.Pin(scl_pin), sda=machine.Pin(sda_pin))
         try:
             self.bme = bme280_int.BME280(i2c=i2c, address=0x76)
@@ -119,7 +121,7 @@ async def set_rtc_ntp(wifi_manager):
 async def check_sensor(sensor_manager):
     while True:
         temps = sensor_manager.read_temperature()
-        if temp is not None:
+        if temps is not None:
             print("Temperature is ", temps)
             await asyncio.sleep(30)
         else:
@@ -131,29 +133,28 @@ async def check_sensor(sensor_manager):
 
 async def main():
     # Initialize the "managers"
-    wifi_manager = WiFiManager(config.NETWORKS)
-    sensor_manager = SensorManager()
+    wifi_manager = WiFiManager(config.WIFI_NETS)
+    sensor_manager = SensorManager(scl_pin=5, sda_pin=4)  # Change as needed based on hardware
 
-    # Do the real work
     try:
         if not await wifi_manager.scan_and_connect():
             print("No known networks in range, will continue to retry")
 
-        # Once connected to network
         wifi_t = asyncio.create_task(wifi_manager.monitor_connection())
         ntp_t = asyncio.create_task(set_rtc_ntp(wifi_manager))
-        temp_t = asyncio.create_task(check_sensor(sensor_manager)
-        # TODO: send_mqtt_message()
+        temp_t = asyncio.create_task(check_sensor(sensor_manager))
+        # mqtt_t = asyncio.create_task(mqtt_transmit(???))
 
-        await asyncio.gather(wifi_t, ntp_t, temp_t)  # TODO: add other tasks here
+        await asyncio.gather(wifi_t, ntp_t, temp_t)  # ,mqtt_t)
     
     except Exception as e:
-        print("Exception - terminating all")
+        print("Exception - terminating")
         print(e)
         try:
-            wifi_monitor.cancel()
-            ntp_update.cancel()
-            # TODO: cancel() methods of other tasks
+            wifi_t.cancel()
+            ntp_t.cancel()
+            temp_t.cancel()
+            # mqtt_t.cancel()
         except (asyncio.CancelledError, NameError):
             print("Tasks cancelled")
     
