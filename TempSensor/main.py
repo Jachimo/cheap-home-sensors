@@ -93,7 +93,7 @@ class SensorManager:
             self.bme = bme280_int.BME280(i2c=i2c, address=i2c_address)
             print("BME280 sensor initialized")
         except Exception as e:
-            print(f"Failed to initialize BME280: {e}")
+            print(f"Failed to initialize sensor: {e}")
             raise
     
     def read_temperature(self):
@@ -172,17 +172,17 @@ async def mqtt_acquire_transmit(wifi_manager, sensor_manager, mqtt_manager, topi
         if wifi_manager.is_connected:
             if not mqtt_manager.is_connected:
                 await mqtt_manager.connect()
-            
             if mqtt_manager.is_connected:
                 temps = sensor_manager.read_temperature()
                 if temps is not None:
                     temp_c, temp_f = temps
-                    mqtt_manager.publish(f"{topic_base}/{config.SENSOR_ID}/temperature/", temp_f)
+                    mqtt_manager.publish(f"{topic_base}/{str(config.SENSOR_ID)}/temperature", str(temp_f))
                 await asyncio.sleep(30)  # Sensor reading interval
             else:
                 await asyncio.sleep(5)  # Wait before retry
         else:
             await asyncio.sleep(5)  # Wait for WiFi
+
 
 # Main Loop
 
@@ -211,6 +211,7 @@ async def main():
             print("Tasks cancelled")
     
     finally:
+        mqtt_manager.disconnect()
         wifi_manager.disconnect()
     
 # Run with asyncio scheduling
