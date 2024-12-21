@@ -8,7 +8,7 @@ import bme280_int
 import collections
 import ntptime
 import time
-from umqtt.simple import MQTTClient
+from umqttsimple import MQTTClient
 
 
 # Utility Classes
@@ -119,7 +119,7 @@ class MQTTManager:
     async def connect(self):
         try:
             self.client = MQTTClient(
-                config.SENSOR_ID,  # set in config.py to override default
+                str(config.SENSOR_ID),  # set in config.py to override default
                 self.mqtt_server,
                 port=self.mqtt_port,
                 user=self.mqtt_user,
