@@ -162,12 +162,14 @@ async def set_rtc_ntp(wifi_manager):
     while True:
         if wifi_manager.is_connected:
             ntptime.settime()
+            print(f"RTC successfully set via NTP from {ntptime.host}")
             await asyncio.sleep(3600)  # update RTC hourly
         else:
+            print(f"RTC clock set failed (tried {ntptime.host}")
             await asyncio.sleep(60)    # if network down, check again in a minute
 
 
-async def mqtt_acquire_transmit(wifi_manager, sensor_manager, mqtt_manager, topic_base="/sensor"):
+async def mqtt_acquire_transmit(wifi_manager, sensor_manager, mqtt_manager, topic_base="sensor"):
     while True:
         if wifi_manager.is_connected:
             if not mqtt_manager.is_connected:
@@ -177,7 +179,7 @@ async def mqtt_acquire_transmit(wifi_manager, sensor_manager, mqtt_manager, topi
                 if temps is not None:
                     temp_c, temp_f = temps
                     mqtt_manager.publish(f"{topic_base}/{config.SENSOR_ID}/temperature", str(temp_f))
-                    print(f"{topic_base}/{config.SENSOR_ID}/temperature", str(temp_f))
+                    print(f"{topic_base}/{config.SENSOR_ID}/temperature =", str(temp_f))
                 await asyncio.sleep(30)  # Sensor reading interval
             else:
                 await asyncio.sleep(5)  # Wait before retry
