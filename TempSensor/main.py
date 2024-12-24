@@ -100,7 +100,7 @@ class SensorManager:
         try:
             self.rawbme = self.bme.read_compensated_data()  # returns array for further processing
             self.tempc = self.rawbme[0] / 100  # temp in deg C
-            self.tempf = (self.tempc * 1.8) + 32 
+            self.tempf = round((self.tempc * 1.8) + 32, 1)
             return self.tempc, self.tempf
         except Exception as e:
             print(f"Error reading temperature: {e}")
