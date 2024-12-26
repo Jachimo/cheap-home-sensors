@@ -40,3 +40,19 @@ class DHT11Sensor:
         except Exception as e:
             print(f"Error reading temperature: {e}")
             return None
+
+class DHT22Sensor:
+    """Class for managing DHT temp/humid sensors."""
+    def __init__(self, dht_pin):
+        self.dht = dht.DHT22(machine.Pin(dht_pin))
+    
+    async def read_temperature(self):
+        try:
+            await asyncio.sleep(2)  # may not be necessary
+            self.dht.measure()
+            self.tempc = self.dht.temperature()
+            self.humid = self.dht.humidity()
+            self.tempf = round((self.tempc * 1.8) + 32, 1)
+        except Exception as e:
+            print(f"Error reading temperature: {e}")
+            return None
