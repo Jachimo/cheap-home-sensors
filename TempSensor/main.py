@@ -8,6 +8,7 @@ import asyncio
 import collections
 import ntptime
 import time
+import gc
 
 from wifimanager import WiFiManager
 #from tempsensors import BMESensor
@@ -33,16 +34,18 @@ async def set_rtc_ntp(wifi_manager):
 
 async def acquire_transmit(wifi_manager, sensor, mqtt_manager, topic_base="sensor"):
     while True:
+        gc.collect()
         if wifi_manager.is_connected:
             if not mqtt_manager.is_connected:
                 await mqtt_manager.connect()
             if mqtt_manager.is_connected:
-                temp_c, temp_f = await sensor.read_temperature()
-                mqtt_manager.publish(f"{topic_base}/{config.SENSOR_ID}/temperature", str(temp_f))
-                print(f"{topic_base}/{config.SENSOR_ID}/temperature =", str(temp_f))
+                svalues = await sensor.read()
+                for key, value in svalues.items():
+                    mqtt_manager.publish(f"{topic_base}/{config.SENSOR_ID}/{key}", str(value))
+                    print(f"{topic_base}/{config.SENSOR_ID}/{key} =", str(value))
                 await asyncio.sleep(30)  # Sensor reading interval
             else:
-                await asyncio.sleep(5)  # Wait before retry
+                await asyncio.sleep(5)  # Wait for MQTT
         else:
             await asyncio.sleep(5)  # Wait for WiFi
 
