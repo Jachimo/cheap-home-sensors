@@ -5,7 +5,9 @@ import bme280_int
 import dht
 
 class BMESensor:
-    """Class for managing Bosch I2C temp sensors."""
+    """Class for managing Bosch BME I2C temp sensors.
+    Note that BMP sensors are identical to BME but humidity == 0.
+    """
     def __init__(self, scl_pin, sda_pin, i2c_address):
         i2c = machine.I2C(scl=machine.Pin(scl_pin), sda=machine.Pin(sda_pin))
         try:
@@ -15,44 +17,80 @@ class BMESensor:
             print(f"Failed to initialize sensor: {e}")
             raise
     
-    def read_temperature(self):
+    async def read(self):
         try:
             self.rawbme = self.bme.read_compensated_data()  # returns array for further processing
-            self.tempc = self.rawbme[0] / 100  # temp in deg C
+            await asyncio.sleep(0.1)
+            self.tempc = round(self.rawbme[0] / 100, 1)
+            self.humid = round(self.rawbme[1], 1)
+            self.press = round(self.rawbme[2], 2)
             self.tempf = round((self.tempc * 1.8) + 32, 1)
-            return self.tempc, self.tempf
+            return True
         except Exception as e:
             print(f"Error reading temperature: {e}")
-            return None
+            return False
+    
+    async def read_temperature(self):
+        await self.read()
+        return self.tempc, self.tempf
+    
+    async def read_humidity(self):
+        await self.read()
+        return self.humid
+    
+    async def read_pressure(self):
+        await self.read()
+        return self.press
+
 
 class DHT11Sensor:
-    """Class for managing DHT temp/humid sensors."""
+    """Class for managing DHT11 temp/humid sensors."""
     def __init__(self, dht_pin):
         self.dht = dht.DHT11(machine.Pin(dht_pin))
     
-    async def read_temperature(self):
+    async def read(self):
         try:
-            await asyncio.sleep(2)  # may not be necessary
             self.dht.measure()
+            await asyncio.sleep(0.8)  # to allow sensor to return values
             self.tempc = self.dht.temperature()
             self.humid = self.dht.humidity()
             self.tempf = round((self.tempc * 1.8) + 32, 1)
+            return True
         except Exception as e:
             print(f"Error reading temperature: {e}")
-            return None
+            return False
+    
+    async def read_temperature(self):
+        await self.read()
+        return self.tempc, self.tempf
+    
+    async def read_humidity(self):
+        await self.read()
+        return self.humid
+
 
 class DHT22Sensor:
-    """Class for managing DHT temp/humid sensors."""
+    """Class for managing DHT22 temp/humid sensors."""
     def __init__(self, dht_pin):
         self.dht = dht.DHT22(machine.Pin(dht_pin))
     
-    async def read_temperature(self):
+    async def read(self):
         try:
-            await asyncio.sleep(2)  # may not be necessary
+            await asyncio.sleep(1)  # may not be necessary
             self.dht.measure()
+            await asyncio.sleep(1)  # to allow sensor to return values
             self.tempc = self.dht.temperature()
             self.humid = self.dht.humidity()
             self.tempf = round((self.tempc * 1.8) + 32, 1)
+            return True
         except Exception as e:
             print(f"Error reading temperature: {e}")
-            return None
+            return False
+        
+    async def read_temperature(self):
+        await self.read()
+        return self.tempc, self.tempf
+    
+    async def read_humidity(self):
+        await self.read()
+        return self.humid

@@ -9,7 +9,8 @@ import ntptime
 import time
 
 from wifimanager import WiFiManager
-from tempsensors import BMESensor
+#from tempsensors import BMESensor
+from tempsensors import DHT22Sensor
 from mqttmanager import MQTTManager
 
 import config  # see config.py.sample
@@ -53,7 +54,8 @@ async def main():
     # Initialize classes
     wifi_manager = WiFiManager(config.WIFI_NETS)
     mqtt_manager = MQTTManager(config.MQTT_ADDR)
-    sensor_bme = BMESensor(scl_pin=5, sda_pin=4, i2c_address=0x76)  # Change as needed based on hardware
+    #sensor_bme = BMESensor(scl_pin=5, sda_pin=4, i2c_address=0x76)
+    sensor_dht = DHT22Sensor(dht_pin=13)  # GPIO 13 (Pin 13) is D7 on the Wemos D1
 
     try:
         if not await wifi_manager.scan_and_connect():
