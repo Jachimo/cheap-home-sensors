@@ -1,9 +1,12 @@
 # tempsensors.py
 
 import machine
+import asyncio
+import ubinascii
+
 import bme280_int
 import dht
-import asyncio
+import onewire, ds18x20
 
 class BMESensor:
     """Class for managing Bosch BME I2C temp sensors.
@@ -120,4 +123,28 @@ class DHT22Sensor:
         if await self.read():
             return self.values['humidity']
         else:
+            return False
+
+class DS18Sensor():
+    def __init__(self, onewirepin):
+        try:
+            self.ds_sensor = ds18x20.DS18X20(onewire.OneWire(machine.Pin(onewirepin)))
+            self.onewire_ids = self.ds_sensor.scan()
+            print(f"Initialized 1-Wire sensors: {[ubinascii.hexlify(i).decode() for i in self.onewire_ids]}")
+        except Exception as e:
+            print(f"Failed to initialize sensor: {e}")
+            raise
+    
+    async def read(self):
+        try:
+            self.ds_sensor.convert_temp()
+            await asyncio.sleep(0.750)
+            self.values = {}
+            for id in self.onewire_ids:  # TODO: Handle multiple sensors on single 1W bus
+                self.values['id'] = ubinascii.hexlify(id).decode()
+                self.values['temperature_c'] = self.ds_sensor.read_temp(id)
+                self.values['temperature'] = round((self.values['temperature_c'] * 1.8) + 32, 1)
+            return self.values
+        except Exception as e:
+            print(f"Error reading temperature: {e}")
             return False

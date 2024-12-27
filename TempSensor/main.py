@@ -35,6 +35,7 @@ async def set_rtc_ntp(wifi_manager):
 async def acquire_transmit(wifi_manager, sensor, mqtt_manager, topic_base="sensor"):
     while True:
         gc.collect()
+        print(f"DEBUG: Free memory currently {gc.mem_free()}")  # TODO: Remove this later        
         if wifi_manager.is_connected:
             if not mqtt_manager.is_connected:
                 await mqtt_manager.connect()
