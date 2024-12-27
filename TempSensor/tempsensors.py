@@ -46,14 +46,14 @@ class BMESensor:
 class DHT11Sensor:
     """Class for managing DHT11 temp/humid sensors."""
     def __init__(self, dht_pin):
-        self.dht = dht.DHT11(machine.Pin(dht_pin))
+        self.dhtsensor = dht.DHT11(machine.Pin(dht_pin))
     
     async def read(self):
         try:
-            self.dht.measure()
+            self.dhtsensor.measure()
             await asyncio.sleep(0.8)  # to allow sensor to return values
-            self.tempc = self.dht.temperature()
-            self.humid = self.dht.humidity()
+            self.tempc = self.dhtsensor.temperature()
+            self.humid = self.dhtsensor.humidity()
             self.tempf = round((self.tempc * 1.8) + 32, 1)
             return True
         except Exception as e:
@@ -72,15 +72,15 @@ class DHT11Sensor:
 class DHT22Sensor:
     """Class for managing DHT22 temp/humid sensors."""
     def __init__(self, dht_pin):
-        self.dht = dht.DHT22(machine.Pin(dht_pin))
+        self.dhtsensor = dht.DHT22(machine.Pin(dht_pin))
     
     async def read(self):
         try:
             await asyncio.sleep(1)  # may not be necessary
-            self.dht.measure()
+            self.dhtsensor.measure()
             await asyncio.sleep(1)  # to allow sensor to return values
-            self.tempc = self.dht.temperature()
-            self.humid = self.dht.humidity()
+            self.tempc = self.dhtsensor.temperature()
+            self.humid = self.dhtsensor.humidity()
             self.tempf = round((self.tempc * 1.8) + 32, 1)
             return True
         except Exception as e:
