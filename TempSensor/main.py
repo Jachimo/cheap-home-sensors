@@ -1,5 +1,6 @@
 # TempSensor main.py
 #  From https://github.com/Jachimo/cheap-home-sensors
+#  Note that asyncio support is required!
 
 import machine
 import network
@@ -64,7 +65,7 @@ async def main():
         wifi_t = asyncio.create_task(wifi_manager.monitor_connection())
         ntp_t = asyncio.create_task(set_rtc_ntp(wifi_manager))
         mqtt_t = asyncio.create_task(
-            acquire_transmit(wifi_manager, sensor_bme, mqtt_manager)
+            acquire_transmit(wifi_manager, sensor_dht, mqtt_manager)
         )
         
         await asyncio.gather(wifi_t, ntp_t, mqtt_t)

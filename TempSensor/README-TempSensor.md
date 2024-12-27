@@ -20,14 +20,19 @@ well for me, but that's the extent of my testing.
 
 ## Parts & Supplies
 
-* **ESP8266 Module** - I prefer the "D1 Mini" style boards to the
-  older 30-pin "NodeMCU" style ones for this use, as
-  they are a bit smaller and tend to be less expensive.
-    * The [Adafruit HUZZAH][afh] modules look particularly nice, but
-      they are about 5x the cost of the generic (Chinese) ones.
+* **ESP8266 Module** - I prefer the "D1 Mini" style boards for simple
+sensors. 
+    * If you are buying them in 2024, try to ensure you are getting
+      the newer version with 4MB of flash, and not the older 1MB part;
+      the 1MB versions require a special build of MicroPython in order
+      to have `asyncio` support.  
+    * See the `fw` directory in this repository if you need to use a
+      1MB chip.
 
-* **Bosch BME280 Sensor Module** - The BME280 is a very small SMT
-  part, but easily available as a prototyping module on a PCB.
+* **Temperature Sensor** - Several sensors are supported, although for
+  general ambient-temperature sensing, I recommend the Bosch BME280.
+  * **Bosch BME280** Sensor Module - The BME280 is a very small SMT part,
+    but easily available as a prototyping module on a PCB.
     * Note that if you want relative humidity, the *BME* is the
       version with RH, not the BMP.
     * Currently they seem to be going for a [bit over
@@ -35,6 +40,12 @@ well for me, but that's the extent of my testing.
       take on some risk of counterfeits.  (At least returns are easy.)
     * [Adafruit][adatemp] and [Pimoroni][digitemp] both have very nice
       versions for a few dollars more. 
+  * **DHT11 / DHT22** - These are older sensors and seem to be less
+    accurate, although YMMV. 
+  * **DS 1-Wire Sensors** - A bit slower, but these sensors tend to be
+    physically smaller, so they're easier to use for remote
+    monitoring, e.g. inside ductwork or even sealed into a probe for
+    liquid temperature monitoring.
 
 * You probably also want **some sort of substrate** to assemble
   everything on.  Use whatever you prefer.

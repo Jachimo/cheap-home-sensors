@@ -1,6 +1,7 @@
 # mqttmanager.py
 
 from umqttsimple import MQTTClient
+import config
 
 class MQTTManager:
     def __init__(self, mqtt_server, mqtt_port=1883, mqtt_user=None, mqtt_password=None):
