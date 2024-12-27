@@ -37,11 +37,9 @@ async def acquire_transmit(wifi_manager, sensor, mqtt_manager, topic_base="senso
             if not mqtt_manager.is_connected:
                 await mqtt_manager.connect()
             if mqtt_manager.is_connected:
-                temps = sensor.read_temperature()
-                if temps is not None:
-                    temp_c, temp_f = temps
-                    mqtt_manager.publish(f"{topic_base}/{config.SENSOR_ID}/temperature", str(temp_f))
-                    print(f"{topic_base}/{config.SENSOR_ID}/temperature =", str(temp_f))
+                temp_c, temp_f = await sensor.read_temperature()
+                mqtt_manager.publish(f"{topic_base}/{config.SENSOR_ID}/temperature", str(temp_f))
+                print(f"{topic_base}/{config.SENSOR_ID}/temperature =", str(temp_f))
                 await asyncio.sleep(30)  # Sensor reading interval
             else:
                 await asyncio.sleep(5)  # Wait before retry

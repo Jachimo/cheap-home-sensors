@@ -3,6 +3,7 @@
 import machine
 import bme280_int
 import dht
+import asyncio
 
 class BMESensor:
     """Class for managing Bosch BME I2C temp sensors.
@@ -72,15 +73,15 @@ class DHT11Sensor:
 class DHT22Sensor:
     """Class for managing DHT22 temp/humid sensors."""
     def __init__(self, dht_pin):
-        self.dht = dht.DHT22(machine.Pin(dht_pin))
+        self.dhtsensor = dht.DHT22(machine.Pin(dht_pin))
+        print(f"Initialized DHT22 on pin {dht_pin}")
     
     async def read(self):
         try:
-            await asyncio.sleep(1)  # may not be necessary
-            self.dht.measure()
-            await asyncio.sleep(1)  # to allow sensor to return values
-            self.tempc = self.dht.temperature()
-            self.humid = self.dht.humidity()
+            self.dhtsensor.measure()
+            await asyncio.sleep(0.7)  # to allow sensor to return values
+            self.tempc = self.dhtsensor.temperature()
+            self.humid = self.dhtsensor.humidity()
             self.tempf = round((self.tempc * 1.8) + 32, 1)
             return True
         except Exception as e:
@@ -88,9 +89,15 @@ class DHT22Sensor:
             return False
         
     async def read_temperature(self):
-        await self.read()
-        return self.tempc, self.tempf
+        if await self.read():
+            return self.tempc, self.tempf
+        else:
+            print(f"Error in read_temperature()")
+            return False
     
     async def read_humidity(self):
-        await self.read()
-        return self.humid
+        if await self.read():
+            return self.humid
+        else:
+            print(f"Error in read_humidity()")
+            return False
