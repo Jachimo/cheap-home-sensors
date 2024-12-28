@@ -3,9 +3,9 @@
 > A cheap room-temperature sensor using an ESP8266, a Bosch
 > BME/BMP280, MQTT, and MicroPython.
 
-Unlike similar $30 COTS sensors, these are cheap enough to have one
-(or more) in every room of the house, allowing for fine-grained HVAC
-control, presence detection, and other stuff.
+My goal was to construct a remote temperature monitor cheap enough to
+have one (or more) in every room of the house, allowing for
+fine-grained HVAC control, presence detection, and other stuff.
 
 ![Sensor on Perfboard](https://github.com/Jachimo/cheap-home-sensors/blob/WIP/docs/images/proto_front.jpg)
 
@@ -42,10 +42,19 @@ sensors.
       versions for a few dollars more. 
   * **DHT11 / DHT22** - These are older sensors and seem to be less
     accurate, although YMMV. 
-  * **DS 1-Wire Sensors** - A bit slower, but these sensors tend to be
-    physically smaller, so they're easier to use for remote
-    monitoring, e.g. inside ductwork or even sealed into a probe for
-    liquid temperature monitoring.
+    * They seem to be made by a variety of manufacturers, all in
+      China, and I'm unclear where the design originated or if any
+      manufacturer is regarded as the "best".  In general, they seem
+      to have a mixed reputation for both accuracy and lifespan.
+    * The DHT22 is more accurate and a bit more expensive than the
+      DHT11, although the same library works with both flavors.
+  * **DS18B20** - Originally designed and produced by Dallas
+    Semiconductor (later Maxim, now part of Analog Devices), these are
+    a bit slower to respond than the Bosch, but don't require a PCB
+    and can often be found in packages suited for wet environments,
+    poking into ductwork, etc.
+    * They use the "OneWire" (or "1-Wire") protocol rather than I2C,
+      with a combined clock/data line and 'parasite power' capability.
 
 * You probably also want **some sort of substrate** to assemble
   everything on.  Use whatever you prefer.
@@ -75,11 +84,36 @@ sensors.
 
 ## Hardware Setup
 
-* The sensor needs two I2C bus lines (clock and data), power, and
-  ground.
-* The code assumes that the BME sensor is connected via I2C to pins 4
-  and 5.  (As `sda=machine.Pin(4), scl=machine.Pin(5)`)
-  * If you want to use different pins, just change them in `main.py`.
+* For the Bosch BMP/BME sensor, you'll need two GPIOs for the I2C bus
+  lines (clock and data), 3.3V power, and ground.
+  * The code assumes that the BME sensor is connected via I2C to pins
+    4 and 5 by default. If you want to use different pins, just change
+    them in `main.py`.
+  * You can connect multiple sensors to the same I2C bus (along with
+    other I2C devices), but some cheap sensor breakout boards have a
+    fixed I2C address, preventing the use of more than one per bus.
+* The DHT11 and DHT22 use their own single-wire digital protocol, and
+  can be connected to any GPIO, plus 3.3V and ground.
+  * Only a single DHT sensor can be connected to each GPIO.
+* The DS18B20 also needs only a single GPIO, plus ground.  You can
+  either provide 3.3V to the power line explicitly, or take advantage
+  of the "parasite power" feature which lets the device draw from the
+  data line.
+  * I have always just connected the +V to 3.3V, however.
+  * Multiple OneWire devices can be attached to a single bus, and
+    accessed individually via their hardcoded 64-bit IDs which are
+    retrieved during an enumeration process.
+  * A 4.7k pull-up between the OneWire data line and 3.3V is
+    frequently recommended, but doesn't seem to be strictly necessary
+    for a single sensor.  This might be a bigger issue if you have
+    many sensors on a single bus.
+  * There [does not seem to be a hard limit][dslimit] on the number of DS18B20s
+    you can hang off a single OneWire bus (and thus a single GPIO
+    pin), but the practical limit is governed by bus length
+    (capacitance in particular) and a level shifter might be a good
+    idea for wires longer than a few feet.
+
+[dslimit]: https://electronics.stackexchange.com/questions/242816/how-many-ds18b20-temperature-sensors-can-i-connect-to-one-bus-arduino
 
 
 ## Networking Setup
@@ -88,11 +122,13 @@ Open the `config.py.example` file, save it as `config.py`, and modify
 as appropriate with your WiFi network(s), MQTT server (aka broker),
 and other values as desired.
 
+
 ## Deploying
 
-[Copy all `.py` files to an ESP8266][rshell] flashed with MicroPython
-and trigger a reset.  The script prints basic status to the REPL
-output, typically visible on the USB UART.
+After modifying as appropriate, [copy all `.py` files to an
+ESP8266][rshell] flashed with MicroPython and trigger a reset.  The
+`main.py` script prints basic status to the REPL output, typically
+visible on the USB UART.
 
 [rshell]: https://github.com/dhylands/rshell
 
