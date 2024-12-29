@@ -24,6 +24,7 @@ import config  # see config.py.sample
 async def set_rtc_ntp(wifi_manager):
     ntptime.host = "pool.ntp.org"
     while True:
+        gc.collect()
         if wifi_manager.is_connected:
             ntptime.settime()
             print(f"RTC successfully set via NTP from {ntptime.host}")
@@ -36,7 +37,6 @@ async def set_rtc_ntp(wifi_manager):
 async def acquire_transmit(wifi_manager, sensor, mqtt_manager, topic_base="sensor"):
     while True:
         gc.collect()
-        print(f"DEBUG: Free memory currently {gc.mem_free()}")  # TODO: Remove this later        
         if wifi_manager.is_connected:
             if not mqtt_manager.is_connected:
                 await mqtt_manager.connect()
@@ -46,6 +46,10 @@ async def acquire_transmit(wifi_manager, sensor, mqtt_manager, topic_base="senso
                     pub_id = svalues['id'][-8:]
                 else:
                     pub_id = config.SENSOR_ID
+                
+                if config.DEBUG:
+                    svalues['free_memory'] = gc.mem_free()
+                
                 for key, value in svalues.items():
                     mqtt_manager.publish(f"{topic_base}/{pub_id}/{key}", str(value))
                     print(f"{topic_base}/{pub_id}/{key} =", str(value))
@@ -79,21 +83,22 @@ async def main():
         
         await asyncio.gather(wifi_t, ntp_t, dht_t) #, bme_t)
 
-    except Exception as e:
-        print("Exception - terminating")
+    except (Exception, KeyboardInterrupt) as e:
+        print("STOP: Terminating and resetting")
         print(e)
         try:
-            wifi_t.cancel()
             ntp_t.cancel()
             dht_t.cancel()
             ds_t.cancel()
             #bme_t.cancel()
+            wifi_t.cancel()
         except (asyncio.CancelledError, NameError):
             print("Tasks cancelled")
     
     finally:
         mqtt_manager.disconnect()
         wifi_manager.disconnect()
+        #machine.reset()
     
 # Run with asyncio scheduling
 asyncio.run(main())

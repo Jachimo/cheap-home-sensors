@@ -26,7 +26,7 @@ class BMESensor:
             self.rawbme = self.bme.read_compensated_data()  # returns array for further processing
             await asyncio.sleep(0.1)
             self.values = {}
-            self.values['temperature_c'] = round(self.rawbme[0] / 100, 1)
+            self.values['temperature_c'] = round(self.rawbme[0] / 100, 2)
             self.values['humidity'] = round(self.rawbme[1], 1)
             self.values['pressure'] = round(self.rawbme[2], 2)
             self.values['temperature'] = round((self.values['temperature_c'] * 1.8) + 32, 1)
@@ -71,7 +71,7 @@ class DHT11Sensor:
             self.values = {}
             self.values['temperature_c'] = self.dhtsensor.temperature()
             self.values['humidity'] = self.dhtsensor.humidity()
-            self.values['temperature'] = round((self.values['temperature_c'] * 1.8) + 32, 1)
+            self.values['temperature'] = round((self.values['temperature_c'] * 1.8) + 32, 2)
             return self.values
         except Exception as e:
             print(f"Error reading temperature: {e}")
@@ -107,7 +107,7 @@ class DHT22Sensor:
             self.values = {}
             self.values['temperature_c'] = self.dhtsensor.temperature()
             self.values['humidity'] = self.dhtsensor.humidity()
-            self.values['temperature'] = round((self.values['temperature_c'] * 1.8) + 32, 1)
+            self.values['temperature'] = round((self.values['temperature_c'] * 1.8) + 32, 2)
             return self.values
         except Exception as e:
             print(f"Error reading temperature: {e}")
@@ -143,7 +143,7 @@ class DS18Sensor():
             for id in self.onewire_ids:  # TODO: Handle multiple sensors on single 1W bus
                 self.values['id'] = ubinascii.hexlify(id).decode()
                 self.values['temperature_c'] = self.ds_sensor.read_temp(id)
-                self.values['temperature'] = round((self.values['temperature_c'] * 1.8) + 32, 1)
+                self.values['temperature'] = round((self.values['temperature_c'] * 1.8) + 32, 2)
             return self.values
         except Exception as e:
             print(f"Error reading temperature: {e}")
