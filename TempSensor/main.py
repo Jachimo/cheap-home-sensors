@@ -41,7 +41,20 @@ async def acquire_transmit(wifi_manager, sensor, mqtt_manager, topic_base="senso
             if not mqtt_manager.is_connected:
                 await mqtt_manager.connect()
             if mqtt_manager.is_connected:
-                svalues = await sensor.read()
+                try:
+                    svalues = await sensor.read()
+                except Exception as e:
+                    print("Exception while reading sensor")
+                    print(e)
+                    await asyncio.sleep(2)
+                    try:
+                        sensor.reset()
+                        continue
+                    except Exception as e:
+                        print("Exception while attempting to reset sensor")
+                        print(e)
+                        raise
+                
                 if 'id' in svalues:
                     pub_id = svalues['id'][-8:]
                 else:
@@ -98,7 +111,9 @@ async def main():
     finally:
         mqtt_manager.disconnect()
         wifi_manager.disconnect()
-        #machine.reset()
+        
+        print("System resetting!")
+        machine.reset()
     
 # Run with asyncio scheduling
 asyncio.run(main())

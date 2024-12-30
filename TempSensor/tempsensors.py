@@ -13,12 +13,25 @@ class BMESensor:
     Note that BMP sensors are identical to BME but humidity == 0.
     """
     def __init__(self, scl_pin, sda_pin, i2c_address):
-        i2c = machine.I2C(scl=machine.Pin(scl_pin), sda=machine.Pin(sda_pin))
+        self.scl = scl_pin
+        self.sda = sda_pin
+        self.i2c_addr = i2c_address
+        i2c = machine.I2C(scl=machine.Pin(self.scl), sda=machine.Pin(self.sda))
         try:
-            self.bme = bme280_int.BME280(i2c=i2c, address=i2c_address)
+            self.bme = bme280_int.BME280(i2c=i2c, address=self.i2c_addr)
             print(f"Bosch sensor {i2c_address} initialized")
         except Exception as e:
             print(f"Failed to initialize sensor: {e}")
+            raise
+    
+    def reset(self):
+        i2c = machine.I2C(scl=machine.Pin(self.scl), sda=machine.Pin(self.sda))
+        try:
+            self.bme = bme280_int.BME280(i2c=i2c, address=self.i2c_addr)
+            print(f"Bosch sensor {i2c_address} initialized")
+        except Exception as e:
+            print("Failed to reset BME sensor")
+            print(e)
             raise
     
     async def read(self):
@@ -57,11 +70,20 @@ class BMESensor:
 class DHT11Sensor:
     """Class for managing DHT11 temp/humid sensors."""
     def __init__(self, dht_pin):
+        self.sensorpin = dht_pin
         try:
-            self.dhtsensor = dht.DHT11(machine.Pin(dht_pin))
-            print(f"Initialized DHT11 on pin {dht_pin}")
+            self.dhtsensor = dht.DHT11(machine.Pin(self.sensorpin))
+            print(f"Initialized DHT11 on pin {self.sensorpin}")
         except Exception as e:
             print(f"Failed to initialize sensor: {e}")
+            raise
+    
+    def reset(self):
+        try:
+            self.dhtsensor = dht.DHT11(machine.Pin(self.sensorpin))
+            print(f"Reinitialized DHT11 on pin {self.sensorpin}")
+        except Exception as e:
+            print(f"Failed to reset sensor: {e}")
             raise
     
     async def read(self):
@@ -93,11 +115,20 @@ class DHT11Sensor:
 class DHT22Sensor:
     """Class for managing DHT22 temp/humid sensors."""
     def __init__(self, dht_pin):
+        self.sensorpin = dht_pin
         try:
-            self.dhtsensor = dht.DHT22(machine.Pin(dht_pin))
-            print(f"Initialized DHT22 on pin {dht_pin}")
+            self.dhtsensor = dht.DHT22(machine.Pin(self.sensorpin))
+            print(f"Initialized DHT22 on pin {self.sensorpin}")
         except Exception as e:
             print(f"Failed to initialize sensor: {e}")
+            raise
+    
+    def reset(self):
+        try:
+            self.dhtsensor = dht.DHT22(machine.Pin(self.sensorpin))
+            print(f"Reinitialized DHT22 on pin {self.sensorpin}")
+        except Exception as e:
+            print(f"Failed to reset sensor: {e}")
             raise
     
     async def read(self):
@@ -126,13 +157,24 @@ class DHT22Sensor:
             return False
 
 class DS18Sensor():
-    def __init__(self, onewirepin):
+    def __init__(self, onewire_pin):
+        self.onewirepin = onewire_pin
         try:
-            self.ds_sensor = ds18x20.DS18X20(onewire.OneWire(machine.Pin(onewirepin)))
+            self.ds_sensor = ds18x20.DS18X20(onewire.OneWire(machine.Pin(self.onewirepin)))
             self.onewire_ids = self.ds_sensor.scan()
             print(f"Initialized 1-Wire sensors: {[ubinascii.hexlify(i).decode() for i in self.onewire_ids]}")
         except Exception as e:
             print(f"Failed to initialize sensor: {e}")
+            raise
+    
+    def reset(self):
+        try:
+            self.ds_sensor = ds18x20.DS18X20(onewire.OneWire(machine.Pin(self.onewirepin)))
+            self.onewire_ids = self.ds_sensor.scan()
+            print(f"Reinitialized 1-Wire sensors: {[ubinascii.hexlify(i).decode() for i in self.onewire_ids]}")
+        except Exception as e:
+            print("Failed to reset DS18 sensor")
+            print(e)
             raise
     
     async def read(self):
