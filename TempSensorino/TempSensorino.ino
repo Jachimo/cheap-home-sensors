@@ -6,7 +6,7 @@
 
 #include <Wire.h>            // I2C aka TwoWire library
 #include <ESP8266WiFi.h>     // WiFi library for ESP8266
-#include <PubSubClient.h>    // MQTT Client
+#include <PubSubClient.h>    // https://pubsubclient.knolleary.net/api
 
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BME280.h>

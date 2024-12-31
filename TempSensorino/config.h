@@ -1,8 +1,9 @@
 // config.h
-// Values starting with SECRET_ will be replaced by the Arduino Web IDE at compile time
 
 #ifndef CONFIG_H
 #define CONFIG_H
+
+#include <arduino_secrets.h>
 
 // WiFi credentials
 const char* ssid = SECRET_WIFI_SSID;
