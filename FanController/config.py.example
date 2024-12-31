@@ -19,3 +19,14 @@ WIFI_NETS = [
 
 MQTT_ADDR = "my.mqtt.broker.example"
 MQTT_PORT = 1883
+
+# Pin assignments
+# Numbers refer to logical/ESP8266 pins, not physical board pins
+led_pin        = 2  # status LED
+button_pin     = 7  # manual on/off button
+
+# Relay pins (active HIGH)
+fan_low_pin    = 1
+fan_med_pin    = 2
+fan_high_pin   = 3
+fan_turbo_pin  = 4
