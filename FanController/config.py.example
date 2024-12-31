@@ -1,0 +1,21 @@
+# -*- mode: python -*-
+
+# Config file for FanController
+# -----------------------------
+# Copy (or "Save As") this file to 'config.py' with real values.
+# Only the '.example' version is saved in VCS.
+
+import ubinascii
+import machine
+
+
+# Set manually if desired, otherwise the machine ID will be used
+SENSOR_ID = str(ubinascii.hexlify(machine.unique_id()))
+
+WIFI_NETS = [
+  ("NetworkName", "AuthKey123456"),
+  ("AltNetworkName", "AltAuthKey123456")
+]
+
+MQTT_ADDR = "my.mqtt.broker.example"
+MQTT_PORT = 1883
