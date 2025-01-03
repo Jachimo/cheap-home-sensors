@@ -25,7 +25,7 @@ class WiFiManager:
         while not self.wlan.isconnected():
             if time.time() - start_time > timeout:
                 return False
-            await asyncio.sleep(0.1)
+            await asyncio.sleep(0.5)
         
         return True
 
@@ -48,7 +48,7 @@ class WiFiManager:
                         self.is_connected = True
                         self.current_network = ssid
                         print(f'Successfully connected to "{ssid}"')
-                        print(f'Network config: {self.wlan.ifconfig()}')
+                        print(f'Network config: {self.wlan.ifconfig()}')  # tuple (ipaddress, subnet mask, gateway, DHCP)
                         return True
                 except Exception as e:
                     print(f'Failed to connect to "{ssid}": {e}')

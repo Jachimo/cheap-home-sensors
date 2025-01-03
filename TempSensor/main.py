@@ -1,5 +1,7 @@
 # TempSensor main.py - https://github.com/Jachimo/cheap-home-sensors
 #  Note: asyncio support is required!
+#
+# This version customized for a DS18-only sensor, with probe on GPIO14 (PCB D5)
 
 import machine
 import network
@@ -13,7 +15,7 @@ from wifimanager import WiFiManager
 from mqttmanager import MQTTManager
 
 #from tempsensors import BMESensor
-from tempsensors import DHT22Sensor
+#from tempsensors import DHT22Sensor
 from tempsensors import DS18Sensor
 
 import config  # see config.py.sample
@@ -56,8 +58,10 @@ async def acquire_transmit(wifi_manager, sensor, mqtt_manager, topic_base="senso
                         raise
                 
                 if 'id' in svalues:
+                    # If the sensor has its own ID, use it
                     pub_id = svalues['id'][-8:]
                 else:
+                    # But if not, publish directly under the tx unit ID
                     pub_id = config.SENSOR_ID
                 
                 if config.DEBUG:
@@ -76,12 +80,12 @@ async def acquire_transmit(wifi_manager, sensor, mqtt_manager, topic_base="senso
 # Main Loop
 
 async def main():
-    # Initialize classes
     wifi_manager = WiFiManager(config.WIFI_NETS)
     mqtt_manager = MQTTManager(config.MQTT_ADDR)
+    
     #sensor_bme = BMESensor(scl_pin=5, sda_pin=4, i2c_address=0x76)
-    sensor_dht = DHT22Sensor(13)  # GPIO 13 is D7 on the WeMos D1
-    sensor_ds  = DS18Sensor(12)   # GPIO 12 is D6 on the WeMos D1
+    #sensor_dht = DHT22Sensor(13)  # GPIO 13 is D7 on the WeMos D1
+    sensor_ds  = DS18Sensor(14)   # GPIO 12 is D6 on the WeMos D1
 
     try:
         if not await wifi_manager.scan_and_connect():
@@ -90,18 +94,20 @@ async def main():
         wifi_t = asyncio.create_task(wifi_manager.monitor_connection())
         ntp_t = asyncio.create_task(set_rtc_ntp(wifi_manager))
         
+        # TODO: Send tx unit's IP address to MQTT server 
+        
         #bme_t = asyncio.create_task(acquire_transmit(wifi_manager, sensor_bme, mqtt_manager))
-        dht_t = asyncio.create_task(acquire_transmit(wifi_manager, sensor_dht, mqtt_manager))
+        #dht_t = asyncio.create_task(acquire_transmit(wifi_manager, sensor_dht, mqtt_manager))
         ds_t  = asyncio.create_task(acquire_transmit(wifi_manager, sensor_ds, mqtt_manager))
         
-        await asyncio.gather(wifi_t, ntp_t, dht_t) #, bme_t)
+        await asyncio.gather(wifi_t, ntp_t, ds_t)#, dht_t) #, bme_t)
 
     except (Exception, KeyboardInterrupt) as e:
         print("STOP: Terminating and resetting")
         print(e)
         try:
             ntp_t.cancel()
-            dht_t.cancel()
+            #dht_t.cancel()
             ds_t.cancel()
             #bme_t.cancel()
             wifi_t.cancel()
