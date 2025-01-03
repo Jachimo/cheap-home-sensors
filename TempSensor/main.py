@@ -1,8 +1,8 @@
 # TempSensor main.py - https://github.com/Jachimo/cheap-home-sensors
 #  Note: asyncio support is required!
 #
-# Development version 20250103T1254
-# This version customized for a BME-only unit, with I2C on pins 4/5
+# Development version 20250103T1428
+# This version customized for a single DS18 probe sender unit
 
 import machine
 import network
@@ -15,9 +15,9 @@ import gc
 from wifimanager import WiFiManager
 from mqttmanager import MQTTManager
 
-from tempsensors import BMESensor
+#from tempsensors import BMESensor
 #from tempsensors import DHT22Sensor
-#from tempsensors import DS18Sensor
+from tempsensors import DS18Sensor
 
 import config  # see config.py.sample
 
@@ -81,12 +81,13 @@ async def acquire_transmit(wifi_manager, sensor, mqtt_manager, topic_base="senso
 # Main Loop
 
 async def main():
+    print(f"Starting up unit {config.SENSOR_ID}")
     wifi_manager = WiFiManager(config.WIFI_NETS)
     mqtt_manager = MQTTManager(config.MQTT_ADDR)
     
-    sensor_bme = BMESensor(scl_pin=5, sda_pin=4, i2c_address=0x76)
+    #sensor_bme = BMESensor(scl_pin=5, sda_pin=4, i2c_address=0x76)
     #sensor_dht = DHT22Sensor(13)  # GPIO 13 is D7 on the WeMos D1
-    #sensor_ds  = DS18Sensor(14)
+    sensor_ds  = DS18Sensor(14)    # GPIO 14 is D5 on the WeMos D1
 
     try:
         if not await wifi_manager.scan_and_connect():
@@ -97,11 +98,11 @@ async def main():
         
         # TODO: Send tx unit's IP address to MQTT server 
         
-        bme_t = asyncio.create_task(acquire_transmit(wifi_manager, sensor_bme, mqtt_manager))
+        #bme_t = asyncio.create_task(acquire_transmit(wifi_manager, sensor_bme, mqtt_manager))
         #dht_t = asyncio.create_task(acquire_transmit(wifi_manager, sensor_dht, mqtt_manager))
-        #ds_t  = asyncio.create_task(acquire_transmit(wifi_manager, sensor_ds, mqtt_manager))
+        ds_t  = asyncio.create_task(acquire_transmit(wifi_manager, sensor_ds, mqtt_manager))
         
-        await asyncio.gather(wifi_t, ntp_t, bme_t)
+        await asyncio.gather(wifi_t, ntp_t, ds_t)
 
     except (Exception, KeyboardInterrupt) as e:
         print("STOP: Terminating and resetting")
