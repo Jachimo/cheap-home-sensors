@@ -23,7 +23,7 @@ class WiFiManager:
         """Attempt to connect to a specific network"""
         print(f'Attempting to connect to "{ssid}"...')
         
-        network.hostname = self.hostname  # sets DHCP Client ID
+        network.hostname(self.hostname)  # sets DHCP Client ID
         self.wlan.connect(ssid, password)
         
         start_time = time.time()
