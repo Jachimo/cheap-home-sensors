@@ -37,11 +37,11 @@ class BMESensor:
     async def read(self):
         try:
             self.rawbme = self.bme.read_compensated_data()  # returns array for further processing
-            await asyncio.sleep(0.1)
+            await asyncio.sleep(0.5)
             self.values = {}
             self.values['temperature_c'] = round(self.rawbme[0] / 100, 2)
-            self.values['humidity'] = round(self.rawbme[1], 1)
-            self.values['pressure'] = round(self.rawbme[2], 2)
+            self.values['pressure'] = round(self.rawbme[1] / 256)  # sensor returns units of Pa * 256
+            self.values['humidity'] = round(self.rawbme[2], 1)  # BMP sensor will always = 0
             self.values['temperature'] = round((self.values['temperature_c'] * 1.8) + 32, 1)
             return self.values
         except Exception as e:
