@@ -5,6 +5,8 @@ import asyncio
 import network
 import time
 
+import config
+
 class WiFiManager:
     def __init__(self, networks):
         """
@@ -12,6 +14,7 @@ class WiFiManager:
         Networks should be a list of tuples: [(ssid1, password1), (ssid2, password2), ...]
         """
         self.networks = networks
+        self.hostname = config.SENSOR_ID
         self.wlan = network.WLAN(network.STA_IF)
         self.is_connected = False
         self.current_network = None
@@ -19,6 +22,8 @@ class WiFiManager:
     async def try_connect(self, ssid, password, timeout=10):
         """Attempt to connect to a specific network"""
         print(f'Attempting to connect to "{ssid}"...')
+        
+        network.hostname = self.hostname  # sets DHCP Client ID
         self.wlan.connect(ssid, password)
         
         start_time = time.time()
