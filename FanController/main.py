@@ -56,17 +56,21 @@ async def main():
             print("No known networks in range, will continue to retry")
     
         wifi_t = asyncio.create_task(wifi_manager.monitor_connection())
+        loop_t = asyncio.create_task(loop(wifi_manager, mqtt_manager))
 
-        await asyncio.gather(wifi_t, )  # FIXME: add other tasks
+        await asyncio.gather(wifi_t, loop_t)
     
     except Exception as e:
-        print("Exception - terminating")
+        print("Exception during startup!")
         print(e)
         try:
             wifi_t.cancel()
-            # Cancel tasks
+            # Cancel other tasks
         except (asyncio.CancelledError, NameError):
             print("Tasks cancelled")
     
     finally:
         wifi_manager.disconnect()
+
+# Run with asyncio scheduling
+asyncio.run(main())
