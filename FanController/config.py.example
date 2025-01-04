@@ -12,10 +12,24 @@ import machine
 # Set manually if desired, otherwise the machine ID will be used
 SENSOR_ID = str(ubinascii.hexlify(machine.unique_id()))
 
+# WiFi Networks to attempt connections to
 WIFI_NETS = [
   ("NetworkName", "AuthKey123456"),
   ("AltNetworkName", "AltAuthKey123456")
 ]
 
+# MQTT Broker
 MQTT_ADDR = "my.mqtt.broker.example"
 MQTT_PORT = 1883
+
+# MQTT Topic Namespace Components
+MQTT_TOPIC_BASE = "fan"
+MQTT_TOPIC_ID   = SENSOR_ID
+
+# Fan Control Relay GPIO Pins
+FAN_RELAYS = {
+    'low': 15,
+    'med': 16,
+    'high': 17,
+    'turbo': 18
+}
