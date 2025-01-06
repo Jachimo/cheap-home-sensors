@@ -9,6 +9,7 @@ import time
 
 from wifimanager import WiFiManager
 from mqttmanager import MQTTManager
+from fancontroller import Fan
 
 import config
 
@@ -40,16 +41,16 @@ async def loop(wifi_manager, mqtt_manager):  # main loop
                 await asyncio.sleep(10)
                 continue
         
-        # check if subscribed to control topic; if not, subscribe to it
-        # set callback for the control topic
-        # when callback fires, check control topic's value
+        # first, set callback for incoming MQTT messages
+        # then, subscribe to desired control topic
 
-        await asyncio.sleep(2)  # loop interval
+        await asyncio.sleep(1)  # loop interval
 
 async def main():
     # Initialize classes
     wifi_manager = WiFiManager(config.WIFI_NETS)
     mqtt_manager = MQTTManager(config.MQTT_ADDR)
+    fan = Fan(config.RELAYS)  # see config.py for GPIO assignments
 
     try:
         if not await wifi_manager.scan_and_connect():

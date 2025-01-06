@@ -26,7 +26,7 @@ class Fan:
 
     async def fan_speed(self, speed=None) -> int:
         if speed == None:
-            return self.speed
+            return self.speed  # if no arguments, return current speed
         if speed != None and speed not in range(0,5):
             raise ValueError("Speed value out of range (0-4)")
         if self.speed == 0:  # if fan is currently stopped
