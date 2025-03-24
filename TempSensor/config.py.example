@@ -9,8 +9,11 @@ import ubinascii
 import machine
 
 
+# Set DEBUG = True for extra status messages to MQTT broker
+DEBUG = True
+
 # Set manually if desired, otherwise the machine ID will be used
-SENSOR_ID = str(ubinascii.hexlify(machine.unique_id()))
+SENSOR_ID = ubinascii.hexlify(machine.unique_id()).decode()
 
 WIFI_NETS = [
   ("NetworkName", "AuthKey123456"),
