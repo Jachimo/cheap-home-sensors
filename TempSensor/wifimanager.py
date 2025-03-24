@@ -12,7 +12,8 @@ class WiFiManager:
         Networks should be a list of tuples: [(ssid1, password1), (ssid2, password2), ...]
         """
         self.networks = networks
-        self.wlan = network.WLAN(network.STA_IF)
+        network.AP_IF.active(False)  # Attempt to turn off on-by-default AP mode interface
+        self.wlan = network.WLAN(network.STA_IF)  # Enable STA (infrastructure) mode
         self.is_connected = False
         self.current_network = None
     
