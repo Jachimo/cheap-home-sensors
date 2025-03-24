@@ -1,7 +1,7 @@
 # TempSensor
 
-> A cheap room-temperature sensor using an ESP8266, a Bosch
-> BME/BMP280, MQTT, and MicroPython.
+> A cheap remote temperature sender, built using the Espressif
+> ESP8266 module and one of several inexpensive digital temperature sensors.
 
 Unlike similar $30 COTS sensors, these are cheap enough to have one
 (or more) in every room of the house, allowing for fine-grained HVAC
@@ -35,6 +35,25 @@ well for me, but that's the extent of my testing.
       take on some risk of counterfeits.  (At least returns are easy.)
     * [Adafruit][adatemp] and [Pimoroni][digitemp] both have very nice
       versions for a few dollars more. 
+  * **DHT11 / DHT22** - These are older sensors and seem to be less
+    accurate, although YMMV. 
+    * They seem to be made by a variety of manufacturers, all in
+      China, and I'm unclear where the design originated or if any
+      manufacturer is regarded as the "best".  In general, they seem
+      to have a mixed reputation for both accuracy and lifespan.
+    * The DHT22 is more accurate and a bit more expensive than the
+      DHT11, although the same library works with both flavors.
+  * **DS18B20** - Originally designed and produced by Dallas
+    Semiconductor (later Maxim, now part of Analog Devices), these are
+    a bit slower to respond than the Bosch, but don't require a PCB
+    and can often be found in packages suited for wet environments,
+    poking into ductwork, etc.
+    * They use the "OneWire" (or "1-Wire") protocol rather than I2C,
+      with a combined clock/data line and 'parasite power' capability.
+  * **Sensirion SHT30** - An alternative to the Bosch, the SHT30 seems
+    to be a bit cheaper and well-regarded for the price.  It's I2C.
+    * Adafruit sells both breakout-board and nice weatherproofed enclosed-
+      probe models, although the latter cost substantially more.
 
 * You probably also want **some sort of substrate** to assemble
   everything on.  Use whatever you prefer.
@@ -120,3 +139,4 @@ output, typically visible on the USB UART.
 [rnt3]: https://randomnerdtutorials.com/micropython-mqtt-publish-bme280-esp32-esp8266/
 [mqttas]: https://github.com/peterhinch/micropython-mqtt/tree/master
 [bosch]: https://www.bosch-sensortec.com/media/boschsensortec/downloads/datasheets/bst-bme280-ds002.pdf
+
