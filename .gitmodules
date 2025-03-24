@@ -1,0 +1,3 @@
+[submodule "usyslog"]
+	path = TempSensor/usyslog
+	url = git@github.com:kfricke/micropython-usyslog.git
