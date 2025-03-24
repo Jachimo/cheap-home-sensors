@@ -18,6 +18,9 @@ class WiFiManager:
         self.wlan = network.WLAN(network.STA_IF)
         self.is_connected = False
         self.current_network = None
+        
+        network.AP_IF.active(False)  # Attempt to turn off on-by-default AP mode interface
+        
     
     async def try_connect(self, ssid, password, timeout=10):
         """Attempt to connect to a specific network"""

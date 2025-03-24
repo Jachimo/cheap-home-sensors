@@ -1,0 +1,1 @@
+../TempSensor/mqttmanager.py
