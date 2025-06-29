@@ -5,7 +5,7 @@
 
 My goal was to construct a remote temperature monitor cheap enough to
 have one (or more) in every room of the house, allowing for
-fine-grained HVAC control, presence detection, and other stuff.
+fine-grained HVAC control, presence detection, and other fun stuff.
 
 ![Sensor on Perfboard](https://github.com/Jachimo/cheap-home-sensors/blob/WIP/docs/images/proto_front.jpg)
 
@@ -71,9 +71,10 @@ sensors.
   had a bunch of these sensors hanging around in my house, dangling
   bare-assed from their MicroUSB connectors, for months at a time.
     * If you are buying an enclosure, note that the ESP module
-      generates a fair bit of heat.  My scripts currently don't do any
+      generates a fair bit of heat.  My code doesn't (currently) do any
       aggressive power-saving (device sleep, etc.) so the module gets
-      noticeably warm.
+      noticeably warm.  You may want to mount your sensor away from, or
+      maybe just below, the main ESP8266.
 
 
 [afh]: https://www.adafruit.com/product/2471

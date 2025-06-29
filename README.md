@@ -13,6 +13,7 @@ and one of several sensors: the BME280/BMP280, DHT11/DHT22, DS18B20, or SHT30.
 
 [TempSensor project README file](TempSensor/README-TempSensor.md).
 
+
 ## FanController
 
 MicroPython code to turn a common HEPA air filter with multi-tap motor into a

@@ -15,11 +15,11 @@ class WiFiManager:
         """
         self.networks = networks
         self.hostname = config.SENSOR_ID
-        self.wlan = network.WLAN(network.STA_IF)
+        self.wlan = network.WLAN(network.STA_IF)  # STA = infrastructure mode, client
         self.is_connected = False
         self.current_network = None
         
-        network.AP_IF.active(False)  # Attempt to turn off on-by-default AP mode interface
+        network.WLAN(network.AP_IF).active(False)  # Turn off access point interface, which is on by default
         
     
     async def try_connect(self, ssid, password, timeout=10):

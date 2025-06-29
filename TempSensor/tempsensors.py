@@ -1,5 +1,7 @@
 # tempsensors.py
 
+from abc import ABC, abstractmethod
+
 import machine
 import asyncio
 import ubinascii
@@ -8,7 +10,21 @@ import bme280_int
 import dht
 import onewire, ds18x20
 
-class BMESensor:
+
+class TempSensor(ABC):
+    """
+    Base class for various types of temperature sensors.
+    """
+    @abstractmethod
+    def read(self):
+        pass
+
+    @abstractmethod
+    def reset(self):
+        pass
+
+
+class BMESensor(TempSensor):
     """Class for managing Bosch BME I2C temp sensors.
     Note that BMP sensors are identical to BME but humidity == 0.
     """
@@ -28,7 +44,7 @@ class BMESensor:
         i2c = machine.I2C(scl=machine.Pin(self.scl), sda=machine.Pin(self.sda))
         try:
             self.bme = bme280_int.BME280(i2c=i2c, address=self.i2c_addr)
-            print(f"Bosch sensor {i2c_address} initialized")
+            print(f"Bosch sensor {self.i2c_addr} initialized")
         except Exception as e:
             print("Failed to reset BME sensor")
             print(e)
@@ -67,7 +83,7 @@ class BMESensor:
             return False
 
 
-class DHT11Sensor:
+class DHT11Sensor(TempSensor):
     """Class for managing DHT11 temp/humid sensors."""
     def __init__(self, dht_pin):
         self.sensorpin = dht_pin
@@ -112,7 +128,7 @@ class DHT11Sensor:
             return False
 
 
-class DHT22Sensor:
+class DHT22Sensor(TempSensor):
     """Class for managing DHT22 temp/humid sensors."""
     def __init__(self, dht_pin):
         self.sensorpin = dht_pin
@@ -156,7 +172,8 @@ class DHT22Sensor:
         else:
             return False
 
-class DS18Sensor():
+
+class DS18Sensor(TempSensor):
     def __init__(self, onewire_pin):
         self.onewirepin = onewire_pin
         try:

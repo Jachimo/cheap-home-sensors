@@ -25,6 +25,7 @@ import config  # see config.py.sample
 # Timer-Driven Coroutines
 
 async def set_rtc_ntp(wifi_manager):
+    """ Synchronize device clock via NTP at specified intervals. """
     ntptime.host = "pool.ntp.org"
     while True:
         gc.collect()
@@ -38,6 +39,7 @@ async def set_rtc_ntp(wifi_manager):
 
 
 async def acquire_transmit(wifi_manager, sensor, mqtt_manager, topic_base="sensor"):
+    """ Acquire data from sensors and transmit to the MQTT broker via WiFi. """
     while True:
         gc.collect()
         if wifi_manager.is_connected:

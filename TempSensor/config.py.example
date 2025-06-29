@@ -9,7 +9,7 @@ import ubinascii
 import machine
 
 
-# Set DEBUG = True for extra status messages to MQTT broker
+# Set DEBUG = True for extra status messages (free memory, etc.) to MQTT broker
 DEBUG = True
 
 # Set manually if desired, otherwise the machine ID will be used
