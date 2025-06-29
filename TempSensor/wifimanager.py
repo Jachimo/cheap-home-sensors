@@ -5,6 +5,8 @@ import asyncio
 import network
 import time
 
+import config
+
 class WiFiManager:
     def __init__(self, networks):
         """
@@ -12,20 +14,26 @@ class WiFiManager:
         Networks should be a list of tuples: [(ssid1, password1), (ssid2, password2), ...]
         """
         self.networks = networks
+        self.hostname = config.SENSOR_ID
         self.wlan = network.WLAN(network.STA_IF)
         self.is_connected = False
         self.current_network = None
+        
+        network.AP_IF.active(False)  # Attempt to turn off on-by-default AP mode interface
+        
     
     async def try_connect(self, ssid, password, timeout=10):
         """Attempt to connect to a specific network"""
         print(f'Attempting to connect to "{ssid}"...')
+        
+        network.hostname(self.hostname)  # sets DHCP Client ID
         self.wlan.connect(ssid, password)
         
         start_time = time.time()
         while not self.wlan.isconnected():
             if time.time() - start_time > timeout:
                 return False
-            await asyncio.sleep(0.1)
+            await asyncio.sleep(0.5)
         
         return True
 
@@ -48,7 +56,7 @@ class WiFiManager:
                         self.is_connected = True
                         self.current_network = ssid
                         print(f'Successfully connected to "{ssid}"')
-                        print(f'Network config: {self.wlan.ifconfig()}')
+                        print(f'Network config: {self.wlan.ifconfig()}')  # tuple (ipaddress, subnet mask, gateway, DHCP)
                         return True
                 except Exception as e:
                     print(f'Failed to connect to "{ssid}": {e}')
