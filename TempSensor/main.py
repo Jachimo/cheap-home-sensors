@@ -15,8 +15,8 @@ import gc
 from wifimanager import WiFiManager
 from mqttmanager import MQTTManager
 
-#from tempsensors import BMESensor
-#from tempsensors import DHT22Sensor
+from tempsensors import BMESensor
+from tempsensors import DHT22Sensor
 from tempsensors import DS18Sensor
 
 import config  # see config.py.sample
@@ -87,8 +87,8 @@ async def main():
     wifi_manager = WiFiManager(config.WIFI_NETS)
     mqtt_manager = MQTTManager(config.MQTT_ADDR)
     
-    #sensor_bme = BMESensor(scl_pin=5, sda_pin=4, i2c_address=0x76)
-    #sensor_dht = DHT22Sensor(13)  # GPIO 13 is D7 on the WeMos D1
+    sensor_bme = BMESensor(scl_pin=5, sda_pin=4, i2c_address=0x76)
+    sensor_dht = DHT22Sensor(13)  # GPIO 13 is D7 on the WeMos D1
     sensor_ds  = DS18Sensor(14)    # GPIO 14 is D5 on the WeMos D1
 
     try:
