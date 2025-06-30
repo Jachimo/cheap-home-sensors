@@ -9,7 +9,8 @@
   },
   "ignore": {
     "extensions": [
-      ".micropythonrc"
+      ".micropythonrc",
+      ".example"
     ],
     "directories": [
       ".vscode"

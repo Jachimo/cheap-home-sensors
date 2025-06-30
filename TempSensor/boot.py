@@ -1,7 +1,7 @@
 # This file is executed on every boot (including wake-boot from deepsleep)
 
 import machine
-import esp
+import esp  # for Espressif devices
 import gc
 import micropython
 

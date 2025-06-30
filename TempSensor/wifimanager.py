@@ -1,4 +1,4 @@
-# WiFi Manager Class
+# WiFi Manager Class by @Jachimo
 #  From https://github.com/Jachimo/cheap-home-sensors
 
 import asyncio

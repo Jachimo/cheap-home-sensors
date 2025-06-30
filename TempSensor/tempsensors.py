@@ -1,4 +1,5 @@
 # tempsensors.py by @Jachimo
+#  From https://github.com/Jachimo/cheap-home-sensors
 
 from abc import ABC, abstractmethod
 from typing import Union
@@ -88,7 +89,7 @@ class BMESensor(TempSensor):
 
 
 class DHT11Sensor(TempSensor):
-    """Class for managing DHT11 temp/humid sensors."""
+    """ Class for managing DHT11 temp/humid sensors. """
     def __init__(self, dht_pin: int) -> None:
         self.sensor_type: str = "DHT11"
         self.sensorpin: int = dht_pin
@@ -116,7 +117,7 @@ class DHT11Sensor(TempSensor):
 
 
 class DHT22Sensor(TempSensor):
-    """Class for managing DHT22 temp/humid sensors."""
+    """ Class for managing DHT22 temp/humid sensors. """
     def __init__(self, dht_pin: int) -> None:
         self.sensor_type: str = "DHT22"
         self.sensorpin: int = dht_pin
@@ -144,6 +145,7 @@ class DHT22Sensor(TempSensor):
 
 
 class DS18Sensor(TempSensor):
+    """ Class for managing DS18x20 (or clones) connected via OneWire interface bus. """
     def __init__(self, onewire_pin: int) -> None:
         self.onewirepin: int = onewire_pin
         self.reset()

@@ -1,8 +1,7 @@
 # TempSensor main.py - https://github.com/Jachimo/cheap-home-sensors
 #  Note: asyncio support is required!
 #
-# Development version 20250103T1428
-# This version customized for a single DS18 probe sender unit
+# Development version 20250630
 
 import machine
 import network
