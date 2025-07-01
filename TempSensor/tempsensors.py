@@ -92,13 +92,13 @@ class DHT11Sensor(TempSensor):
     """ Class for managing DHT11 temp/humid sensors. """
     def __init__(self, dht_pin: int) -> None:
         self.sensor_type: str = "DHT11"
-        self.sensorpin: int = dht_pin
+        self.sensor_pin: int = dht_pin
         self.reset()
     
     def reset(self) -> None:
         try:
-            self.dht = dht.DHT11(machine.Pin(self.sensorpin))
-            print(f"Initialized DHT11 on pin {self.sensorpin}")
+            self.dht = dht.DHT11(machine.Pin(self.sensor_pin))
+            print(f"Initialized DHT11 on pin {self.sensor_pin}")
         except Exception as e:
             print(f"Failed to reset sensor: {e}")
             raise
@@ -120,13 +120,13 @@ class DHT22Sensor(TempSensor):
     """ Class for managing DHT22 temp/humid sensors. """
     def __init__(self, dht_pin: int) -> None:
         self.sensor_type: str = "DHT22"
-        self.sensorpin: int = dht_pin
+        self.sensor_pin: int = dht_pin
         self.reset()
     
     def reset(self) -> None:
         try:
-            self.dhtsensor = dht.DHT22(machine.Pin(self.sensorpin))
-            print(f"Reinitialized DHT22 on pin {self.sensorpin}")
+            self.dhtsensor = dht.DHT22(machine.Pin(self.sensor_pin))
+            print(f"Reinitialized DHT22 on pin {self.sensor_pin}")
         except Exception as e:
             print(f"Failed to reset sensor: {e}")
             raise
@@ -147,12 +147,13 @@ class DHT22Sensor(TempSensor):
 class DS18Sensor(TempSensor):
     """ Class for managing DS18x20 (or clones) connected via OneWire interface bus. """
     def __init__(self, onewire_pin: int) -> None:
-        self.onewirepin: int = onewire_pin
+        self.sensor_type: str = "DS18"
+        self.sensor_pin: int = onewire_pin
         self.reset()
     
     def reset(self) -> None:
         try:
-            self.ds_sensor = ds18x20.DS18X20(onewire.OneWire(machine.Pin(self.onewirepin)))
+            self.ds_sensor = ds18x20.DS18X20(onewire.OneWire(machine.Pin(self.sensor_pin)))
             self.onewire_ids = self.ds_sensor.scan()  # possible to have multiple sensors on same line
             print(f"Reinitialized 1-Wire sensors: {[ubinascii.hexlify(i).decode() for i in self.onewire_ids]}")
         except Exception as e:

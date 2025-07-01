@@ -12,13 +12,34 @@ import machine
 # Set DEBUG = True for extra status messages (free memory, etc.) to MQTT broker
 DEBUG = True
 
-# Set manually if desired, otherwise the machine ID will be used
+# Set manually if desired, default is machine ID
 SENSOR_ID = ubinascii.hexlify(machine.unique_id()).decode()
 
+# Each tuple in the list is a WiFi SSID / key; each pair is tried sequentially in order
 WIFI_NETS = [
   ("NetworkName", "AuthKey123456"),
   ("AltNetworkName", "AltAuthKey123456")
 ]
 
+# MQTT broker configuration
 MQTT_ADDR = "my.mqtt.broker.example"
 MQTT_PORT = 1883
+
+# Connected sensors - supported types are "BME", "DHT11", "DHT22", "DS18"
+#  Comment out / remove any not in use! 
+SENSORS = { 
+    "BME" : {
+      "scl_pin" : 5,
+      "sda_pin" : 4,
+      "i2c_address" : 0x76 
+    },
+    "DHT11" : {
+      "sensor_pin" : 13   # GPIO 13 is D7 on the WeMos D1
+    },
+    "DHT22" : {
+      "sensor_pin" : 13
+    },
+    "DS18" : {
+      "sensor_pin": 14     # GPIO 14 is D5 on the WeMos D1
+    }
+}
