@@ -99,6 +99,7 @@ async def main():
     addl_values['location'] = config.LOCATION
     if config.DEBUG:
         addl_values['free_memory'] = gc.mem_free()
+        # TODO: Also add unit's IP address if DEBUG is enabled
 
     if not await wifi_manager.scan_and_connect():
         print("No known networks in range, will continue to retry")
